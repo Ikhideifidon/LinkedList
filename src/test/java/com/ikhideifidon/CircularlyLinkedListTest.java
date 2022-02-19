@@ -2,6 +2,8 @@ package com.ikhideifidon;
 
 import org.junit.jupiter.api.*;
 
+import java.util.Iterator;
+
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class CircularlyLinkedListTest {
 
@@ -9,12 +11,12 @@ class CircularlyLinkedListTest {
 
     @BeforeAll
     public void setUpAll() {
-        System.out.println("Should print before all tests.");
+        circularlyLinkedList = new CircularlyLinkedList<>();
+        System.out.println("Should Initialize the circularlyLinkedList variable for all tests.");
     }
 
     @BeforeEach
     public void setUp() {
-        circularlyLinkedList = new CircularlyLinkedList<>();
         for (int i = 1; i <= 12; i++)
             circularlyLinkedList.addLast(i);
     }
@@ -30,7 +32,17 @@ class CircularlyLinkedListTest {
 
     @Test
     public void shouldIterateOverTheCircularlyLinkedList() {
+        Iterator<Integer> iter = circularlyLinkedList.iterator();
+        Assertions.assertTrue(iter.hasNext());
+        Assertions.assertEquals(1, iter.next());
+        Assertions.assertEquals(2, iter.next());
 
+    }
+
+    @Test
+    public void shouldReturnNullWhenTargetIsNull() {
+        for (var element : circularlyLinkedList)
+            Assertions.assertNotNull(element);
     }
 
     @Test
@@ -56,6 +68,7 @@ class CircularlyLinkedListTest {
     @Test
     void rotate() {
         circularlyLinkedList.rotate();
+        Assertions.assertEquals(1, circularlyLinkedList.last());
     }
 
     @Test
@@ -65,17 +78,40 @@ class CircularlyLinkedListTest {
     @Test
     void removeFirst() throws EmptyLinkedListException {
         Assertions.assertEquals(12, circularlyLinkedList.removeLast());
+        Assertions.assertEquals(11, circularlyLinkedList.size());
+        Assertions.assertFalse(circularlyLinkedList.isEmpty());
     }
 
     @Test
     void removeLast() {
-        Assertions.assertThrows(EmptyLinkedListException.class, () -> circularlyLinkedList.removeLast());
+//        Assertions.assertDoesNotThrow(EmptyLinkedListException.class, () -> circularlyLinkedList.removeLast());
     }
 
+    /**
+     * Testing for clone contracts:
+     * x.clone != x;
+     * x.getClass() == x.clone.getClass();
+     * x.clone.equals(x)
+     * @throws CloneNotSupportedException: Throw an exception.
+     */
     @Test
-    void testClone() {
+    void testClone() throws CloneNotSupportedException {
+        CircularlyLinkedList<Integer> circularlyLinkedList2 = circularlyLinkedList.clone();
+        // x.clone != x;
+        Assertions.assertNotSame(circularlyLinkedList2, circularlyLinkedList);
+        // x.getClass() == x.clone.getClass();
+        Assertions.assertSame(circularlyLinkedList2.getClass(), circularlyLinkedList.getClass());
+        // x.clone.equals(x)
+        Assertions.assertEquals(circularlyLinkedList2, circularlyLinkedList);
     }
 
+    /**
+     * Testing for equal contracts:
+     * x.equals(x)--> True;
+     * x.equals(y) --> True if y.equals(x) --> True
+     * if x.equals(y) --> True, y.equals(z) --> True, then x.equals(z) --> True
+     * For any non-null reference value x, x.equals(null) --> False
+     */
     @Test
     void testEquals() {
     }
