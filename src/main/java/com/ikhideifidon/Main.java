@@ -32,7 +32,7 @@ public class Main {
         System.out.println();
         System.out.println("Linked List 1: " + l1);
         System.out.println("Linked List 2: " + l2);
-        System.out.println(l1.addTwoNumber(l2));
+        System.out.println(SinglyLinkedListExercises.addTwoNumber(l1, l2));
         System.out.println("Linked List 1: " + l1);
 
         l1.addAll(l3);
