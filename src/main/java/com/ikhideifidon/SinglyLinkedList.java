@@ -1,7 +1,5 @@
 package com.ikhideifidon;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -14,7 +12,7 @@ public class SinglyLinkedList<E extends Comparable<E>> implements Iterable<E>, C
 
             @Override
             public boolean hasNext() {
-                return (index != null);
+                return index != null;
             }
 
             @Override
@@ -29,45 +27,19 @@ public class SinglyLinkedList<E extends Comparable<E>> implements Iterable<E>, C
     }
 
     private static class Node<E> {
-        private E data;
-        private Node<E> next;
+        public E data;
+        public Node<E> next;
 
-        public Node() { }
-        public Node(E data) { this.data = data; }
+        public Node(E data) { this(data, null); }
 
         public Node(E data, Node<E> next) {
             this.data = data;
             this.next = next;
         }
-
-        public void setData(E data) {
-            this.data = data;
-        }
-
-        public void setNext(Node<E> next) {
-            this.next = next;
-        }
-
-        public E getData() {
-            return data;
-        }
-
-        public Node<E> getNext() {
-            return next;
-        }
-
-
     }
 
-    private Node<E> head;
-    private Node<E> tail;
-    private int currentSize;
-
-    public SinglyLinkedList() {                    // constructs an initially empty linkedList.
-        head = null;
-        tail = null;
-        currentSize = 0;
-    }
+    private Node<E> head = null, tail = null;
+    private int currentSize = 0;
 
     public int size() {
         return currentSize;
@@ -80,12 +52,12 @@ public class SinglyLinkedList<E extends Comparable<E>> implements Iterable<E>, C
     public E first() {
         if (isEmpty())
             return null;
-        return head.getData();
+        return head.data;
     }
 
     public E last() {
         if (isEmpty()) return null;
-        return tail.getData();
+        return tail.data;
     }
 
     // update methods
@@ -98,11 +70,11 @@ public class SinglyLinkedList<E extends Comparable<E>> implements Iterable<E>, C
 
 
     public void addLast(E e) {
-        Node<E> newest = new Node<>(e, null);
+        Node<E> newest = new Node<>(e);
         if (isEmpty())
             head = newest;
         else
-            tail.setNext(newest);
+            tail.next = newest;
         tail = newest;
         currentSize++;
     }
@@ -110,8 +82,8 @@ public class SinglyLinkedList<E extends Comparable<E>> implements Iterable<E>, C
     public E removeFirst() {
         if (isEmpty())
             return null;
-        E answer = head.getData();
-        head = head.getNext();
+        E answer = head.data;
+        head = head.next;
         currentSize--;
         if (currentSize == 0)
             tail = null;
@@ -176,7 +148,6 @@ public class SinglyLinkedList<E extends Comparable<E>> implements Iterable<E>, C
     }
 
     public void reverse() {
-        Node<E> temp = head;
         Node<E> current = head;
         Node<E> previous = null;
         while (current != null) {
@@ -188,26 +159,25 @@ public class SinglyLinkedList<E extends Comparable<E>> implements Iterable<E>, C
         head = previous;
     }
 
+    /**
+     * This gives a reversed sample of the LinkedList
+     */
     public SinglyLinkedList<E> reversed() throws CloneNotSupportedException {
-        /**
-         * This gives a reversed sample of the LinkedList
-         */
-        SinglyLinkedList<E> copied = this.clone();
+        SinglyLinkedList<E> copied = clone();
         copied.reverse();
         return copied;
-
     }
 
     @Override
     public String toString() {
-        Node<E> current = head;
         StringBuilder sb = new StringBuilder("[");
-        while (current != null) {
-            sb.append(current.data);
+        E last = last();
+
+        for (E data: this) {
+            sb.append(data);
             // This prevents the trailing delimiter.
-            if (current.next != null)
+            if (data != last)
                 sb.append("-->");
-            current = current.next;
         }
         sb.append("]");
         return sb.toString();
@@ -216,77 +186,39 @@ public class SinglyLinkedList<E extends Comparable<E>> implements Iterable<E>, C
     @Override
     public SinglyLinkedList<E> clone() throws CloneNotSupportedException {
         SinglyLinkedList<E> other = (SinglyLinkedList<E>) super.clone();
-        if (currentSize > 0) {
-            other.head = new Node<>(head.getData(), null);
-            Node<E> walk = head.getNext();
-            Node<E> otherTail = other.head;
-            while (walk != null) {
-                Node<E> newest = new Node<>(walk.getData(), null);
-                otherTail.setNext(newest);
-                otherTail = newest;
-                walk = walk.getNext();
-            }
 
+        if (currentSize > 0) {
+            other.head = new Node<>(head.data);
+
+            Node<E> otherTail = other.head;
+            for (E data: this) {
+                Node<E> newest = new Node<>(data);
+                otherTail.next = newest;
+                otherTail = newest;
+            }
         }
+
         return other;
     }
 
-    @SuppressWarnings({ "rawtypes" })
     public boolean equals(Object o) {
-        if (o instanceof SinglyLinkedList other) {
-            other = (SinglyLinkedList) o;
-            if (this.currentSize != other.currentSize)
-                return false;
-            Node walkA = head;
-            Node walkB = other.head;
-            while (walkA != null) {
-                if (!walkA.getData().equals(walkB.getData()))           //mismatch
-                    return false;
-                walkA = walkA.getNext();
-                walkB = walkB.getNext();
-            }
-            return true;
-        }
-        return false;
-    }
-
-    public SinglyLinkedList addTwoNumber(@NotNull SinglyLinkedList<Integer> other) {
-        Node<Integer> current = (Node<Integer>) head;
-        SinglyLinkedList<Integer> result = new SinglyLinkedList<>();
-        int size = 0;
-        int carryOver = 0;
-        while (current != null || other.head != null || carryOver != 0) {
-            if (current != null) {
-                carryOver +=current.getData();
-                current = current.getNext();
-            }
-            if (other.head != null) {
-                carryOver += other.head.getData();
-                other.head = other.head.getNext();
-            }
-            Node<Integer> newest = new Node<>(carryOver % 10);
-            if (size == 0)
-                result.head = newest;
-            else
-                result.tail.setNext(newest);
-            result.tail = newest;
-            carryOver /= 10;
-            size++;
-        }
-        return result;
-    }
-
-    public boolean addAll(SinglyLinkedList<E> listCollection) {
-        if (listCollection.isEmpty())
+        if (getClass() != o.getClass())
             return false;
-        Node<E> current = listCollection.head;
-        while (current != null) {
-            Node<E> newest = new Node<>(current.getData());
-            tail.setNext(newest);
-            tail = newest;
-            currentSize++;
-            current = current.getNext();
+
+        SinglyLinkedList<E> other = (SinglyLinkedList<E>) o;
+        if (this.currentSize != other.currentSize)
+            return false;
+
+        Iterator<E> walkB = other.iterator();
+        for (E dataA : this) {
+            if (!dataA.equals(walkB.next()))           //mismatch
+                return false;
         }
         return true;
+    }
+
+    public void addAll(Iterable<E> listCollection) {
+        for (E data: listCollection)
+            addLast(data);
     }
 }
